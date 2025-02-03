@@ -1,0 +1,5 @@
+Dollar,Wood,Iron,Widget
+Mine,Dollar.10,,Iron.1,"+1 iron/s"
+Forest,Dollar.10,,Wood.1,"+1 wood/s"
+Factory,Dollar.25,Wood.3-Iron.1,Widget.2,"3 wood + 1 iron = 2 widget/s"
+Store,Dollar.10,Widget.1,Dollar.5,"1 widget = 5 dollar/s"
