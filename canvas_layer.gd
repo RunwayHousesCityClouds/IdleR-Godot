@@ -21,14 +21,12 @@ func _ready():
 	##Build GUI
 	#Add Supply Cards
 	for card in supplyCards:
-		#card.size_flags_horizontal = Control.SIZE_SHRINK_END
-		#card.nameLabel.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-		#card.amtLabel.size_flags_horizontal = Control.SIZE_SHRINK_END
 		grid_container.add_child(card)
 	
 	#Add Factor Cards
 	for f in factors:
 		var fCard = idleR.factorCard.new(f)
+		#Bind buy & sell buttons
 		fCard.buyButton.pressed.connect(fCard.buy.bind(1))
 		fCard.buyButton.pressed.connect(_update_supplies.bind())
 		fCard.sellButton.pressed.connect(fCard.sell.bind(1))
