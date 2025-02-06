@@ -35,6 +35,8 @@ offset_left = 45.0
 offset_top = 34.0
 offset_right = 815.0
 offset_bottom = 596.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
 columns = 2
 
 [node name="FactorPanelContainer5" type="PanelContainer" parent="CanvasLayer/FactorGridContainer"]

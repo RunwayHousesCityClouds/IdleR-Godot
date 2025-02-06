@@ -57,10 +57,10 @@ class factorCard extends PanelContainer:
 		margCont.add_theme_constant_override("margin_bottom", margin_value)
 		margCont.add_theme_constant_override("margin_right", margin_value)
 		var gridCont = GridContainer.new()
-		var hBox = HBoxContainer.new()
-		var vBox1 = VBoxContainer.new()
-		var vBox2 = VBoxContainer.new()
-		vBox2.size_flags_horizontal = Control.SIZE_SHRINK_END
+		var hBoxLabels = HBoxContainer.new()
+		var hBoxButtons = HBoxContainer.new()
+		var vBoxMain = VBoxContainer.new()
+		var vBoxLabels = VBoxContainer.new()
 		
 		var nameLabel = Label.new()
 		nameLabel.text = str(factor.name)
@@ -70,25 +70,27 @@ class factorCard extends PanelContainer:
 		costLabel.text = factor.deltaAsString(factor.cost)
 		self.buyButton = Button.new()
 		buyButton.text = "Buy"
-		buyButton.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 		self.quantLabel = Label.new()
 		quantLabel.text = str(factor.quant)
+		quantLabel.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 		self.sellButton = Button.new()
 		sellButton.text = "Sell"
-		sellButton.size_flags_vertical = Control.SIZE_SHRINK_END
+		sellButton.size_flags_horizontal = Control.SIZE_SHRINK_END
 		
-		vBox1.add_child(nameLabel)
-		vBox1.add_child(descLabel)
-		vBox1.add_child(costLabel)
-		vBox1.add_child(buyButton)
+		vBoxLabels.add_child(nameLabel)
+		vBoxLabels.add_child(descLabel)
+		vBoxLabels.add_child(costLabel)
 		
-		vBox2.add_child(quantLabel)
-		vBox2.add_child(sellButton)
+		hBoxLabels.add_child(vBoxLabels)
+		hBoxLabels.add_child(quantLabel)
 		
-		hBox.add_child(vBox1)
-		hBox.add_child(vBox2)
+		hBoxButtons.add_child(buyButton)
+		hBoxButtons.add_child(sellButton)
 		
-		gridCont.add_child(hBox)
+		vBoxMain.add_child(hBoxLabels)
+		vBoxMain.add_child(hBoxButtons)
+		
+		gridCont.add_child(vBoxMain)
 		
 		margCont.add_child(gridCont)
 		
