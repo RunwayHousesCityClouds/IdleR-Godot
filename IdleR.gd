@@ -111,18 +111,15 @@ class supplyCard extends HBoxContainer:
 	
 	func _init(supply: Supply):
 		self.supply = supply
-		#self.size_flags_horizontal = Control.SIZE_EXPAND
 		self.nameLabel = Label.new()
 		nameLabel.text = str(self.supply.name)
 		self.amtLabel = Label.new()
 		amtLabel.text = str(self.supply.quant)
-		#amtLabel.size_flags_horizontal = Control.SIZE_SHRINK_END
 		self.add_child(nameLabel)
 		self.add_child(amtLabel)
 	
 	func update():
 		amtLabel.text = str(supply.quant)
-		#print(supply.name + "\t" + str(supply.quant))
 	
 	static func toSupplyCardArray(supArray: Array[Supply]) -> Array[supplyCard]:
 		var supCardArray: Array[supplyCard]
