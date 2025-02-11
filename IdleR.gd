@@ -178,18 +178,53 @@ class Supply:
 class Delta:
 	var sup: Supply
 	var quant: int = 0
+	var diceQuant: int = 0:
+		set(value):
+			diceQuant = value
+			if (diceQuant != 0) && (diceVal != 0):
+				is_variable = true
+	var diceVal: int = 0:
+		set(value):
+			if value < 0:
+				print("ERROR: diceVal cannot be less than 0!")
+			else:
+				diceVal = value
+				if (diceQuant != 0) && (diceVal != 0):
+					is_variable = true
+	var diceScalar: int = 0
+	var is_variable: bool = false
 
 	# Constructor
-	func _init(sup: Supply, quant: int):
+	func _init(sup: Supply, quant: int, diceQuant: int = 0, diceVal: int = 0, diceScalar: int = 0):
 		self.sup = sup
 		self.quant = quant
+		self.diceQuant = diceQuant
+		self.diceVal = diceVal
+		self.diceScalar = diceScalar
+	
+	func rollQuant():
+		if is_variable:
+			var RNG = RandomNumberGenerator.new()
+			var total: int = 0
+			for i in range(self.diceQuant):
+				total += RNG.randi_range(1, self.diceVal)
+			total += self.diceScalar
+			self.quant = total
 	
 	func toStr() -> String:
 		var s: String
-		
-		s = str(quant) + " " + str(sup.name)
-		if quant != 1:
-			s = s + "s"
+		if is_variable:
+			var sign: String
+			if diceScalar >= 0:
+				sign = "+"
+			else:
+				sign = ""
+			s = str(diceQuant) + "d" + str(diceVal) + sign + str(diceScalar) + " " + str(sup.name) + "s"
+			
+		else:
+			s = str(quant) + " " + str(sup.name)
+			if quant != 1:
+				s = s + "s"
 		return s
 
 # Factor class
@@ -232,6 +267,7 @@ class Factor:
 				can_afford = false
 				var go_count = 0
 				for delta in consume:
+					delta.rollQuant()
 					if delta.sup.quant >= delta.quant:
 						go_count += 1
 				if go_count == consume.size():
@@ -240,6 +276,7 @@ class Factor:
 						delta.sup.mod_quant(-delta.quant)
 			if can_afford and has_prod:
 				for delta in produce:
+					delta.rollQuant()
 					delta.sup.mod_quant(delta.quant)
 
 	func buy(amount: int):
