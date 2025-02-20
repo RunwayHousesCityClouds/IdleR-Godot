@@ -30,16 +30,53 @@ func _parse_delta_data(data: String, supplies: Array[Supply]) -> Array[Delta]:
 	var supplyNames: Array[String]
 	for sup in supplies:
 		supplyNames.append(sup.name)
-	var deltaDataAsArray = data.split("-")
+	var deltaDataAsArray = data.split(";")
 	for datum in deltaDataAsArray:
 		if !datum.is_empty():
+			var delta: Delta
 			var deltaParsed = datum.split(".")
 			var deltaName = deltaParsed[0]
-			var deltaAmt = int(deltaParsed[1])
 			var index = supplyNames.find(deltaName)
-			var delta = Delta.new(supplies[index], deltaAmt)
+			var deltaAmt = deltaParsed[1]
+			if deltaParsed[1].begins_with("R"):
+				#parse as random
+				delta = _parse_RNGdelta(supplies[index], deltaAmt)
+			else:
+				#parse as constant
+				deltaAmt = int(deltaParsed[1])
+				delta = Delta.new(supplies[index], deltaAmt)
 			deltas.append(delta)
 	return deltas
+
+func _parse_RNGdelta(supply: Supply, RNG: String) -> Delta:
+	var delta: Delta
+	var quant: int
+	var val: int
+	var offset: int = 0
+	
+	var removeR = RNG.split("R")[1]
+	#get quant
+	var quantString = removeR.split("d")[0]
+	if quantString.begins_with("-"):
+		var quantStringMag = quantString.lstrip("-")
+		quant = -int(quantStringMag)
+	else:
+		quant = int(quantString)
+	#get val & offset
+	var rightString = removeR.split("d")[1]
+	var rightParsed
+	if ("+" in rightString):
+		rightParsed = rightString.split("+")
+		val = int(rightParsed[0])
+		offset = int(rightParsed[1])
+	elif ("-" in rightString):
+		rightParsed = rightString.split("-")
+		val = int(rightParsed[0])
+		offset = -int(rightParsed[1])
+	else:
+		val = int(rightString)
+	delta = Delta.new(supply, 0, quant, val, offset)
+	return delta
 
 class factorCard extends PanelContainer:
 	var factor: Factor
@@ -191,35 +228,42 @@ class Delta:
 				diceVal = value
 				if (diceQuant != 0) && (diceVal != 0):
 					is_variable = true
-	var diceScalar: int = 0
+	var diceOffset: int = 0
 	var is_variable: bool = false
 
 	# Constructor
-	func _init(sup: Supply, quant: int, diceQuant: int = 0, diceVal: int = 0, diceScalar: int = 0):
+	func _init(sup: Supply, quant: int, diceQuant: int = 0, diceVal: int = 0, diceOffset: int = 0):
 		self.sup = sup
 		self.quant = quant
 		self.diceQuant = diceQuant
 		self.diceVal = diceVal
-		self.diceScalar = diceScalar
+		self.diceOffset = diceOffset
 	
 	func rollQuant():
 		if is_variable:
 			var RNG = RandomNumberGenerator.new()
 			var total: int = 0
-			for i in range(self.diceQuant):
-				total += RNG.randi_range(1, self.diceVal)
-			total += self.diceScalar
+			var count: int
+			var dir: int = 1
+			if self.diceQuant<0:
+				count = -self.diceQuant
+				dir = -1
+			else:
+				count = self.diceQuant
+			for i in range(count):
+				total += dir * RNG.randi_range(1, self.diceVal)
+			total += self.diceOffset
 			self.quant = total
 	
 	func toStr() -> String:
 		var s: String
 		if is_variable:
 			var sign: String
-			if diceScalar >= 0:
+			if diceOffset >= 0:
 				sign = "+"
 			else:
 				sign = ""
-			s = str(diceQuant) + "d" + str(diceVal) + sign + str(diceScalar) + " " + str(sup.name) + "s"
+			s = str(diceQuant) + "d" + str(diceVal) + sign + str(diceOffset) + " " + str(sup.name) + "s"
 			
 		else:
 			s = str(quant) + " " + str(sup.name)
