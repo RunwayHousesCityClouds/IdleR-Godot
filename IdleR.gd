@@ -14,7 +14,6 @@ func _parse_supply_data(file: Array[String]) -> Array[Supply]:
 			name = str
 		sup = Supply.new(name)
 		sup.mod_quant(amount)
-		print(sup.quant)
 		supplies.append(sup)
 	return supplies
 	

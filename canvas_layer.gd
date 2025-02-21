@@ -18,8 +18,6 @@ var supplyCards: Array[IdleR.supplyCard] = idleR.supplyCard.toSupplyCardArray(su
 	
 
 func _ready():
-	#supplies[0].mod_quant(100)
-	
 	##Build GUI
 	#Add Supply Cards
 	for card in supplyCards:
@@ -33,13 +31,12 @@ func _ready():
 		fCard.buyButton.pressed.connect(_update_supplies.bind())
 		fCard.sellButton.pressed.connect(fCard.sell.bind(1))
 		fCard.sellButton.pressed.connect(_update_supplies.bind())
+		factor_grid_container.add_child(fCard)
 		
 		#var buy10button = Button.new()
 		#buy10button.pressed.connect(fCard.buy.bind(10))
 		#buy10button.pressed.connect(_update_supplies.bind())
 		#buy10button.text = "Buy 10"
-		
-		factor_grid_container.add_child(fCard)
 		#factor_grid_container.add_child(buy10button)
 
 func _on_button_pressed() -> void:
