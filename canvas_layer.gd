@@ -18,7 +18,7 @@ var supplyCards: Array[IdleR.supplyCard] = idleR.supplyCard.toSupplyCardArray(su
 	
 
 func _ready():
-	supplies[0].mod_quant(100)
+	#supplies[0].mod_quant(100)
 	
 	##Build GUI
 	#Add Supply Cards

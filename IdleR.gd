@@ -4,7 +4,17 @@ func _parse_supply_data(file: Array[String]) -> Array[Supply]:
 	var supplies: Array[Supply]
 	var supplyStringArray = file[0].split(",")
 	for str in supplyStringArray:
-		var sup = Supply.new(str)
+		var sup: Supply
+		var name: String
+		var amount: int = 0
+		if "." in str:
+			name = str.split(".")[0]
+			amount = int(str.split(".")[1])
+		else:
+			name = str
+		sup = Supply.new(name)
+		sup.mod_quant(amount)
+		print(sup.quant)
 		supplies.append(sup)
 	return supplies
 	
