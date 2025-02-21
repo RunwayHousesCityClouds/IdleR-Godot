@@ -7,8 +7,10 @@ var idleR = IdleR.new()
 @onready var grid_container: GridContainer = $SupplyPanelContainer/MarginContainer/GridContainer
 
 #File handling
-var file = FileAccess.open("game.txt", FileAccess.READ)
-var fileAsArray = file.get_file_as_string("game.txt").split("\n")
+
+var fileName = "game.txt"
+var file = FileAccess.open(fileName, FileAccess.READ)
+var fileAsArray = file.get_file_as_string(fileName).split("\n")
 
 var supplies = idleR._parse_supply_data(fileAsArray)
 var factors = idleR._parse_factor_data(fileAsArray, supplies)

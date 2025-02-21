@@ -11,18 +11,19 @@ func _parse_supply_data(file: Array[String]) -> Array[Supply]:
 func _parse_factor_data(file: Array[String], supplies: Array[Supply]) -> Array[Factor]:
 	var factors: Array[Factor]
 	for i in range(1, file.size()):
-		var factorAsArray = file[i].split(",")
-		var factorName = factorAsArray[0]
-		var factorCost = _parse_delta_data(factorAsArray[1], supplies)
-		var factorCon = _parse_delta_data(factorAsArray[2], supplies)
-		var factorProd = _parse_delta_data(factorAsArray[3], supplies)
-		var factorDesc = factorAsArray[4]
-		
-		var factor = Factor.new(factorName, factorCost)
-		factor.consume = factorCon
-		factor.produce = factorProd
-		factor.desc = factorDesc
-		factors.append(factor)
+		if !file[i].is_empty():
+			var factorAsArray = file[i].split(",")
+			var factorName = factorAsArray[0]
+			var factorCost = _parse_delta_data(factorAsArray[1], supplies)
+			var factorCon = _parse_delta_data(factorAsArray[2], supplies)
+			var factorProd = _parse_delta_data(factorAsArray[3], supplies)
+			var factorDesc = factorAsArray[4]
+			
+			var factor = Factor.new(factorName, factorCost)
+			factor.consume = factorCon
+			factor.produce = factorProd
+			factor.desc = factorDesc
+			factors.append(factor)
 	return factors
 
 func _parse_delta_data(data: String, supplies: Array[Supply]) -> Array[Delta]:
