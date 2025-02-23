@@ -21,7 +21,7 @@ func _parse_factor_data(file: Array[String], supplies: Array[Supply]) -> Array[F
 	var factors: Array[Factor]
 	for i in range(1, file.size()):
 		if !file[i].is_empty():
-			var factorAsArray = file[i].split(",")
+			var factorAsArray = file[i].split(";")
 			var factorName = factorAsArray[0]
 			var factorCost = _parse_delta_data(factorAsArray[1], supplies)
 			var factorCon = _parse_delta_data(factorAsArray[2], supplies)
@@ -40,7 +40,7 @@ func _parse_delta_data(data: String, supplies: Array[Supply]) -> Array[Delta]:
 	var supplyNames: Array[String]
 	for sup in supplies:
 		supplyNames.append(sup.name)
-	var deltaDataAsArray = data.split(";")
+	var deltaDataAsArray = data.split(",")
 	for datum in deltaDataAsArray:
 		if !datum.is_empty():
 			var delta: Delta
