@@ -46,16 +46,19 @@ func _parse_delta_data(data: String, supplies: Array[Supply]) -> Array[Delta]:
 			var delta: Delta
 			var deltaParsed = datum.split(".")
 			var deltaName = deltaParsed[0]
-			var index = supplyNames.find(deltaName)
-			var deltaAmt = deltaParsed[1]
-			if deltaParsed[1].begins_with("R"):
-				#parse as random
-				delta = _parse_RNGdelta(supplies[index], deltaAmt)
+			if deltaName not in supplyNames:
+				print("ERROR: " + datum + " - Supply " + deltaName + " not in Supplies!")
 			else:
-				#parse as constant
-				deltaAmt = int(deltaParsed[1])
-				delta = Delta.new(supplies[index], deltaAmt)
-			deltas.append(delta)
+				var index = supplyNames.find(deltaName)
+				var deltaAmt = deltaParsed[1]
+				if deltaParsed[1].begins_with("R"):
+					#parse as random
+					delta = _parse_RNGdelta(supplies[index], deltaAmt)
+				else:
+					#parse as constant
+					deltaAmt = int(deltaParsed[1])
+					delta = Delta.new(supplies[index], deltaAmt)
+				deltas.append(delta)
 	return deltas
 
 func _parse_RNGdelta(supply: Supply, RNG: String) -> Delta:
