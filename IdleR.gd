@@ -8,10 +8,10 @@ func _parse_supply_data(file: Array[String]) -> Array[Supply]:
 		var name: String
 		var amount: int = 0
 		if "." in str:
-			name = str.split(".")[0]
+			name = str.split(".")[0].rstrip("\r")
 			amount = int(str.split(".")[1])
 		else:
-			name = str
+			name = str.rstrip("\r")
 		sup = Supply.new(name)
 		sup.mod_quant(amount)
 		supplies.append(sup)
