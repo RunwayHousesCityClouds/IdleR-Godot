@@ -1,10 +1,10 @@
 extends Node
 
-func _parse_supply_data(file: Array[String]) -> Array[Supply]:
-	var supplies: Array[Supply]
+func _parse_supply_data(file: Array[String]) -> Array[Flow]:
+	var supplies: Array[Flow]
 	var supplyStringArray = file[0].split(",")
 	for str in supplyStringArray:
-		var sup: Supply
+		var flow: Flow
 		var name: String
 		var amount: int = 0
 		if "." in str:
@@ -12,13 +12,13 @@ func _parse_supply_data(file: Array[String]) -> Array[Supply]:
 			amount = int(str.split(".")[1])
 		else:
 			name = str.rstrip("\r")
-		sup = Supply.new(name)
-		sup.mod_quant(amount)
-		supplies.append(sup)
+		flow = Flow.new(name)
+		flow.mod_quant(amount)
+		supplies.append(flow)
 	return supplies
 	
-func _parse_factor_data(file: Array[String], supplies: Array[Supply]) -> Array[Factor]:
-	var factors: Array[Factor]
+func _parse_factor_data(file: Array[String], supplies: Array[Flow]) -> Array[Flow]:
+	var factors: Array[Flow]
 	for i in range(1, file.size()):
 		if !file[i].is_empty():
 			var factorAsArray = file[i].split(";")
@@ -28,40 +28,41 @@ func _parse_factor_data(file: Array[String], supplies: Array[Supply]) -> Array[F
 			var factorProd = _parse_delta_data(factorAsArray[3], supplies)
 			var factorDesc = factorAsArray[4]
 			
-			var factor = Factor.new(factorName, factorCost)
+			var factor = Flow.new(factorName)
+			factor.cost = factorCost
 			factor.consume = factorCon
 			factor.produce = factorProd
 			factor.desc = factorDesc
 			factors.append(factor)
 	return factors
 
-func _parse_delta_data(data: String, supplies: Array[Supply]) -> Array[Delta]:
+func _parse_delta_data(data: String, flows: Array[Flow]) -> Array[Delta]:
 	var deltas: Array[Delta]
-	var supplyNames: Array[String]
-	for sup in supplies:
-		supplyNames.append(sup.name)
+	var flowNames: Array[String]
+	for flow in flows:
+		flowNames.append(flow.name)
 	var deltaDataAsArray = data.split(",")
 	for datum in deltaDataAsArray:
 		if !datum.is_empty():
 			var delta: Delta
 			var deltaParsed = datum.split(".")
 			var deltaName = deltaParsed[0]
-			if deltaName not in supplyNames:
+			if deltaName not in flowNames:
 				print("ERROR: " + datum + " - Supply " + deltaName + " not in Supplies!")
 			else:
-				var index = supplyNames.find(deltaName)
+				var index = flowNames.find(deltaName)
 				var deltaAmt = deltaParsed[1]
 				if deltaParsed[1].begins_with("R"):
 					#parse as random
-					delta = _parse_RNGdelta(supplies[index], deltaAmt)
+					delta = _parse_RNGdelta(flows[index], deltaAmt)
 				else:
 					#parse as constant
 					deltaAmt = int(deltaParsed[1])
-					delta = Delta.new(supplies[index], deltaAmt)
+					delta = Delta.new(flows[index], deltaAmt)
 				deltas.append(delta)
 	return deltas
 
-func _parse_RNGdelta(supply: Supply, RNG: String) -> Delta:
+func _parse_RNGdelta(flow: Flow, RNG: String) -> Delta:
 	var delta: Delta
 	var quant: int
 	var val: int
@@ -88,17 +89,17 @@ func _parse_RNGdelta(supply: Supply, RNG: String) -> Delta:
 		offset = -int(rightParsed[1])
 	else:
 		val = int(rightString)
-	delta = Delta.new(supply, 0, quant, val, offset)
+	delta = Delta.new(flow, 0, quant, val, offset)
 	return delta
 
 class factorCard extends PanelContainer:
-	var factor: Factor
+	var flow: Flow
 	var buyButton: Button
 	var sellButton: Button
 	var quantLabel: Label
 	
-	func _init(factor: Factor):
-		self.factor = factor
+	func _init(flow: Flow):
+		self.flow = flow
 		
 		var margCont = MarginContainer.new()
 		var margin_value = 20
@@ -113,15 +114,15 @@ class factorCard extends PanelContainer:
 		var vBoxLabels = VBoxContainer.new()
 		
 		var nameLabel = Label.new()
-		nameLabel.text = str(factor.name)
+		nameLabel.text = str(flow.name)
 		var descLabel = Label.new()
-		descLabel.text = str(factor.desc)
+		descLabel.text = str(flow.desc)
 		var costLabel = Label.new()
-		costLabel.text = factor.deltaAsString(factor.cost)
+		costLabel.text = flow.deltaAsString(flow.cost)
 		self.buyButton = Button.new()
 		buyButton.text = "Buy"
 		self.quantLabel = Label.new()
-		quantLabel.text = str(factor.quant)
+		quantLabel.text = str(flow.quant)
 		quantLabel.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 		self.sellButton = Button.new()
 		sellButton.text = "Sell"
@@ -147,31 +148,31 @@ class factorCard extends PanelContainer:
 		self.add_child(margCont)
 	
 	func buy(quant: int):
-		self.factor.buy(quant)
-		self.quantLabel.text = str(self.factor.quant)
+		self.flow.buy(quant)
+		self.quantLabel.text = str(self.flow.quant)
 	
 	func sell(quant: int):
-		self.factor.sell(quant)
-		self.quantLabel.text = str(self.factor.quant)
+		self.flow.sell(quant)
+		self.quantLabel.text = str(self.flow.quant)
 
 class supplyCard extends HBoxContainer:
-	var supply: Supply
+	var flow: Flow
 	var nameLabel: Label
 	var amtLabel: Label
 	
-	func _init(supply: Supply):
-		self.supply = supply
+	func _init(flow: Flow):
+		self.flow = flow
 		self.nameLabel = Label.new()
-		nameLabel.text = str(self.supply.name)
+		nameLabel.text = str(self.flow.name)
 		self.amtLabel = Label.new()
-		amtLabel.text = str(self.supply.quant)
+		amtLabel.text = str(self.flow.quant)
 		self.add_child(nameLabel)
 		self.add_child(amtLabel)
 	
 	func update():
-		amtLabel.text = str(supply.quant)
+		amtLabel.text = str(flow.quant)
 	
-	static func toSupplyCardArray(supArray: Array[Supply]) -> Array[supplyCard]:
+	static func toSupplyCardArray(supArray: Array[Flow]) -> Array[supplyCard]:
 		var supCardArray: Array[supplyCard]
 		for s in supArray:
 			var supCard = supplyCard.new(s)
@@ -180,53 +181,9 @@ class supplyCard extends HBoxContainer:
 
 ##Refactored IdleR API Java code to GDScript
 
-# Supply class
-class Supply:
-	var name: String = ""
-	var desc: String = ""
-	var max: int = 0:
-		set(value):
-			if value > min:
-				has_max = true
-				max = value
-			else:
-				print("%s's max cannot be lower than min" % name)
-	var min: int = 0:
-		set(value):
-			if has_max:
-				if value > max:
-					print("%s's min cannot be higher than max" % name)
-				else:
-					min = value
-			else:
-				min = value
-	var quant: int = 0:
-		set(value):
-			if has_max and value > max:
-				quant = max
-			elif value < min:
-				quant = min
-			else:
-				quant = value
-	var lock: bool = false
-	var has_max: bool = false
-
-	# Constructor
-	func _init(name: String, lock: bool = false, has_max: bool = false):
-		self.name = name
-		self.desc = ""
-		self.min = 0
-		self.has_max = has_max
-		self.quant = 0
-		self.lock = lock
-
-	# Modify quantity
-	func mod_quant(amount: int):
-		self.quant += amount
-
 # Delta class
 class Delta:
-	var sup: Supply
+	var flow: Flow
 	var quant: int = 0
 	var diceQuant: int = 0:
 		set(value):
@@ -245,8 +202,8 @@ class Delta:
 	var is_variable: bool = false
 
 	# Constructor
-	func _init(sup: Supply, quant: int, diceQuant: int = 0, diceVal: int = 0, diceOffset: int = 0):
-		self.sup = sup
+	func _init(flow: Flow, quant: int, diceQuant: int = 0, diceVal: int = 0, diceOffset: int = 0):
+		self.flow = flow
 		self.quant = quant
 		self.diceQuant = diceQuant
 		self.diceVal = diceVal
@@ -276,19 +233,44 @@ class Delta:
 				sign = "+"
 			else:
 				sign = ""
-			s = str(diceQuant) + "d" + str(diceVal) + sign + str(diceOffset) + " " + str(sup.name) + "s"
+			s = str(diceQuant) + "d" + str(diceVal) + sign + str(diceOffset) + " " + str(flow.name) + "s"
 			
 		else:
-			s = str(quant) + " " + str(sup.name)
+			s = str(quant) + " " + str(flow.name)
 			if quant != 1:
 				s = s + "s"
 		return s
 
-# Factor class
-class Factor:
+class Flow:
 	var name: String = ""
 	var desc: String = ""
-	var cost: Array[Delta] = []
+	var quant: int = 0:
+		set(value):
+			if has_max and value > max:
+				quant = max
+			elif has_min and value < min:
+				quant = min
+			else:
+				quant = value
+	
+	var max: int = 0:
+		set(value):
+			if has_min and value > min:
+				has_max = true
+				max = value
+			else:
+				print("%s's max cannot be lower than min" % name)
+	var min: int = 0:
+		set(value):
+			if has_max and value < max:
+				has_min = true
+				min = value
+			else:
+				print("%s's min cannot be higher than max" % name)
+	var cost: Array[Delta] = []:
+		set(value):
+			has_cost = true
+			cost = value
 	var produce: Array[Delta] = []:
 		set(value):
 			has_prod = true
@@ -297,26 +279,35 @@ class Factor:
 		set(value):
 			has_con = true
 			consume = value
-	var quant: int = 0
 	var sell_factor: float = 0.5
+	
+	var has_max: bool = false
+	var has_min: bool = true
+	var has_cost: bool = false
 	var has_prod: bool = false
 	var has_con: bool = false
-	var can_sell: bool = false
-	var lock: bool = false
-
-	# Constructor
-	func _init(name: String, cost: Array[Delta], can_sell: bool = true, lock: bool = false):
+	
+	var is_displayed: bool = true
+	var is_sensitized: bool = true
+	var can_buy: bool = true
+	var can_sell: bool = true
+	
+	#Constructors
+	func _init(name: String):
 		self.name = name
-		self.desc = ""
-		self.cost = cost
-		self.quant = 0
-		self.sell_factor = 0.5
-		self.has_con = false
-		self.has_prod = false
-		self.can_sell = can_sell
-		self.lock = lock
-
+		
+	func newFactor(name: String):
+		var flow = Flow.new(name)
+		return flow
+		
+	func newSupply(name: String):
+		var flow = Flow.new(name)
+		return flow
+	
 	# Methods
+	func mod_quant(amount: int):
+		self.quant += amount
+		
 	func convert():
 		for _i in range(quant):
 			var can_afford = true
@@ -325,32 +316,32 @@ class Factor:
 				var go_count = 0
 				for delta in consume:
 					delta.rollQuant()
-					if delta.sup.quant >= delta.quant:
+					if delta.flow.quant >= delta.quant:
 						go_count += 1
 				if go_count == consume.size():
 					can_afford = true
 					for delta in consume:
-						delta.sup.mod_quant(-delta.quant)
+						delta.flow.mod_quant(-delta.quant)
 			if can_afford and has_prod:
 				for delta in produce:
 					delta.rollQuant()
-					delta.sup.mod_quant(delta.quant)
+					delta.flow.mod_quant(delta.quant)
 
 	func buy(amount: int):
-		if amount > 0:
+		if amount > 0 and can_buy:
 			var go_count = 0
 			for cost_item in cost:
-				if cost_item.sup.quant >= cost_item.quant * amount:
+				if cost_item.flow.quant >= cost_item.quant * amount:
 					go_count += 1
 			if go_count == cost.size():
 				for cost_item in cost:
-					cost_item.sup.mod_quant(-cost_item.quant * amount)
+					cost_item.flow.mod_quant(-cost_item.quant * amount)
 				quant += amount
 
 	func sell(amount: int):
 		if amount <= quant and can_sell:
 			for cost_item in cost:
-				cost_item.sup.mod_quant(int(cost_item.quant * amount * sell_factor))
+				cost_item.flow.mod_quant(int(cost_item.quant * amount * sell_factor))
 			quant -= amount
 	
 	func deltaAsString(dArray: Array[Delta]) -> String:
