@@ -157,6 +157,13 @@ class factorCard extends PanelContainer:
 	
 	func update():
 		quantLabel.text = str(flow.quant)
+	
+	static func toFactorCardArray(factorArray: Array[Flow]) -> Array[factorCard]:
+		var factorCardArray: Array[factorCard]
+		for f in factorArray:
+			var facCard = factorCard.new(f)
+			factorCardArray.append(facCard)
+		return factorCardArray
 
 class supplyCard extends HBoxContainer:
 	var flow: Flow
