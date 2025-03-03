@@ -154,23 +154,26 @@ class factorCard extends PanelContainer:
 	func sell(quant: int):
 		self.flow.sell(quant)
 		self.quantLabel.text = str(self.flow.quant)
+	
+	func update():
+		quantLabel.text = str(flow.quant)
 
 class supplyCard extends HBoxContainer:
 	var flow: Flow
 	var nameLabel: Label
-	var amtLabel: Label
+	var quantLabel: Label
 	
 	func _init(flow: Flow):
 		self.flow = flow
 		self.nameLabel = Label.new()
 		nameLabel.text = str(self.flow.name)
-		self.amtLabel = Label.new()
-		amtLabel.text = str(self.flow.quant)
+		self.quantLabel = Label.new()
+		quantLabel.text = str(self.flow.quant)
 		self.add_child(nameLabel)
-		self.add_child(amtLabel)
+		self.add_child(quantLabel)
 	
 	func update():
-		amtLabel.text = str(flow.quant)
+		quantLabel.text = str(flow.quant)
 	
 	static func toSupplyCardArray(supArray: Array[Flow]) -> Array[supplyCard]:
 		var supCardArray: Array[supplyCard]
