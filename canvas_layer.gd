@@ -28,9 +28,9 @@ func _ready():
 	for card in factorCards:
 		#Bind buy & sell buttons
 		card.buyButton.pressed.connect(card.buy.bind(1))
-		card.buyButton.pressed.connect(_update_supplies.bind())
+		card.buyButton.pressed.connect(_update.bind())
 		card.sellButton.pressed.connect(card.sell.bind(1))
-		card.sellButton.pressed.connect(_update_supplies.bind())
+		card.sellButton.pressed.connect(_update.bind())
 		factor_grid_container.add_child(card)
 
 		#var buy10button = Button.new()
@@ -41,26 +41,26 @@ func _ready():
 
 func _on_button_pressed() -> void:
 	# +1 Dollar
-	factors[0].mod_quant(1)
-	_update_supplies()
+	supplies[0].mod_quant(1)
+	_update()
 
 func _on_button_2_pressed() -> void:
 	# +1 Wood, -2 Dollar
 	if supplies[0].quant >= 2:
 		supplies[0].mod_quant(-2)
 		supplies[1].mod_quant(1)
-		_update_supplies()
+		_update()
 	
 
 func _process(delta: float) -> void:
-	_update_supplies()
+	_update()
 
 func _on_timer_timeout() -> void:
 	for f in factors:
 		f.convert()
-	_update_supplies()
+	_update()
 
-func _update_supplies() -> void:
+func _update() -> void:
 	for card in supplyCards:
 		card.update()
 	for card in factorCards:
