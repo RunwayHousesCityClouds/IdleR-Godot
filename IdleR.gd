@@ -1,5 +1,39 @@
 extends Node
 
+func _parse_game_data(file: Array[String]) -> Dictionary:
+	var flows: Array[Flow]
+	var factorIndex: int
+	
+	#parse Supply flows, add to master list
+	flows = _parse_supply_data(file)
+	factorIndex = flows.size()
+	
+	#parse Factor names, add to master list
+	for i in range(1, file.size()):
+		if !file[i].is_empty():
+			var factorAsArray = file[i].split(";")
+			var factorName = factorAsArray[0]
+			var factor = Flow.new(factorName)
+			flows.append(factor)
+	
+	#finish Factor flows
+	for i in range(1, file.size()):
+		if !file[i].is_empty():
+			var factorAsArray = file[i].split(";")
+			var factorCost = _parse_delta_data(factorAsArray[1], flows)
+			var factorCon = _parse_delta_data(factorAsArray[2], flows)
+			var factorProd = _parse_delta_data(factorAsArray[3], flows)
+			var factorDesc = factorAsArray[4]
+			var index = factorIndex + i - 1
+			
+			flows[index].cost = factorCost
+			flows[index].consume = factorCon
+			flows[index].produce = factorProd
+			flows[index].desc = factorDesc
+	
+	var gameMaster = {"flows": flows, "factorIndex": factorIndex}
+	return gameMaster
+
 func _parse_supply_data(file: Array[String]) -> Array[Flow]:
 	var supplies: Array[Flow]
 	var supplyStringArray = file[0].split(",")
