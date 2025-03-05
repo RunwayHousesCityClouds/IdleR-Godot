@@ -12,10 +12,11 @@ var fileName = "game.txt"
 var file = FileAccess.open(fileName, FileAccess.READ)
 var fileAsArray = file.get_file_as_string(fileName).split("\n")
 
-var supplies = idleR._parse_supply_data(fileAsArray)
-var factors = idleR._parse_factor_data(fileAsArray, supplies)
-var supplyCards: Array[IdleR.supplyCard] = idleR.supplyCard.toSupplyCardArray(supplies)
-var factorCards: Array[IdleR.factorCard] = idleR.factorCard.toFactorCardArray(factors)
+var gameData = idleR._parse_game_data(fileAsArray)
+var flows = gameData.flows
+var factorIndex = gameData.factorIndex
+var supplyCards: Array[IdleR.supplyCard] = idleR.supplyCard.toSupplyCardArray(flows.slice(0, factorIndex))
+var factorCards: Array[IdleR.factorCard] = idleR.factorCard.toFactorCardArray(flows.slice(factorIndex, flows.size()))
 	
 
 func _ready():
@@ -41,14 +42,14 @@ func _ready():
 
 func _on_button_pressed() -> void:
 	# +1 Dollar
-	supplies[0].mod_quant(1)
+	flows[0].mod_quant(1)
 	_update()
 
 func _on_button_2_pressed() -> void:
 	# +1 Wood, -2 Dollar
-	if supplies[0].quant >= 2:
-		supplies[0].mod_quant(-2)
-		supplies[1].mod_quant(1)
+	if flows[0].quant >= 2:
+		flows[0].mod_quant(-2)
+		flows[1].mod_quant(1)
 		_update()
 	
 
@@ -56,7 +57,7 @@ func _process(delta: float) -> void:
 	_update()
 
 func _on_timer_timeout() -> void:
-	for f in factors:
+	for f in flows:
 		f.convert()
 	_update()
 
