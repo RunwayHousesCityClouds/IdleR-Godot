@@ -50,8 +50,9 @@ func _parse_supply_data(file: Array[String]) -> Array[Flow]:
 		flow.mod_quant(amount)
 		supplies.append(flow)
 	return supplies
-	
+
 func _parse_factor_data(file: Array[String], supplies: Array[Flow]) -> Array[Flow]:
+	#NOTE: not used but retained for posterity
 	var factors: Array[Flow]
 	for i in range(1, file.size()):
 		if !file[i].is_empty():
