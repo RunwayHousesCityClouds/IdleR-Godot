@@ -15,8 +15,10 @@ var fileAsArray = file.get_file_as_string(fileName).split("\n")
 var gameData = idleR._parse_game_data(fileAsArray)
 var flows = gameData.flows
 var factorIndex = gameData.factorIndex
-var supplyCards: Array[IdleR.supplyCard] = idleR.supplyCard.toSupplyCardArray(flows.slice(0, factorIndex))
-var factorCards: Array[IdleR.factorCard] = idleR.factorCard.toFactorCardArray(flows.slice(factorIndex, flows.size()))
+
+var cardData = idleR._parse_card_data(flows, factorIndex)
+var supplyCards = cardData.supplyCards
+var factorCards = cardData.factorCards
 	
 
 func _ready():

@@ -34,6 +34,12 @@ func _parse_game_data(file: Array[String]) -> Dictionary:
 	var gameMaster = {"flows": flows, "factorIndex": factorIndex}
 	return gameMaster
 
+func _parse_card_data(flows: Array[Flow], factorIndex: int) -> Dictionary:
+	var supplyCards: Array[supplyCard] = supplyCard.toSupplyCardArray(flows.slice(0, factorIndex))
+	var factorCards: Array[factorCard] = factorCard.toFactorCardArray(flows.slice(factorIndex, flows.size()))
+	var cardData = {"supplyCards": supplyCards, "factorCards": factorCards}
+	return cardData
+
 func _parse_supply_data(file: Array[String]) -> Array[Flow]:
 	var supplies: Array[Flow]
 	var supplyStringArray = file[0].split(",")
