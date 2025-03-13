@@ -403,7 +403,7 @@ class Flow:
 			s += dArray[i].toStr()
 		return s
 
-#NOTE: Upgrade is not implemented
+##TODO: finish class
 
 # Upgrade class
 class Upgrade:
@@ -413,25 +413,14 @@ class Upgrade:
 		set(value):
 			has_cost = true
 			cost = value
-	var prod: Array[Delta] = []:
-		set(value):
-			has_prod = true
-			prod = value
-	var has_prod: bool = false
 	var has_cost: bool = false
 	var isDisplayed: bool = false
 	var isSensitized: bool = false
-	
-	
-	var doesChangeDelta = false
-	var doesModQuant = false
-	var doesUnlockElement = false
 
 	# Constructor
-	func _init(name: String, desc: String, cost: Array[Delta]=[], prod: Array[Delta]=[], isDisplayed: bool = false, isSensitized: bool = false):
+	func _init(name: String, desc: String, cost: Array[Delta]=[], isDisplayed: bool = false, isSensitized: bool = false):
 		self.name = name
 		self.desc = desc
 		self.cost = cost
-		self.prod = prod
 		self.isDisplayed = isDisplayed
 		self.isSensitized = isSensitized
