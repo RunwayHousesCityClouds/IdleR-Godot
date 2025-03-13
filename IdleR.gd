@@ -413,7 +413,28 @@ class Upgrade:
 		set(value):
 			has_cost = true
 			cost = value
+	var modQuants: Array[String]:
+		set(value):
+			has_modQuants = true
+			modQuants = value
+	var modDeltas: Array[String]:
+		set(value):
+			has_modDeltas = true
+			modDeltas = value
+	var toggleFlowLocks: Array[String]:
+		set(value):
+			has_toggleFlowLocks = true
+			toggleFlowLocks = value
+	var toggleButtonLocks: Array[String]:
+		set(value):
+			has_toggleButtonLocks = true
+			toggleButtonLocks = value
+	
 	var has_cost: bool = false
+	var has_modQuants: bool = false
+	var has_modDeltas: bool = false
+	var has_toggleFlowLocks: bool = false
+	var has_toggleButtonLocks: bool = false
 	var isDisplayed: bool = false
 	var isSensitized: bool = false
 
@@ -424,3 +445,6 @@ class Upgrade:
 		self.cost = cost
 		self.isDisplayed = isDisplayed
 		self.isSensitized = isSensitized
+	
+	func _parse_Upgrade_string(data: String):
+		pass
